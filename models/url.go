@@ -6,7 +6,7 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-type SaveURL struct {
+type URLObj struct {
 	Id    string `json:"id" redis:"id"`
 	URL   string `json:"link" redis:"link"`
 	Count int    `json:"count" redis:"count"`
@@ -18,7 +18,7 @@ func SaveURLToDB(id string, url string) error {
 	switch {
 	//key doesn't exist
 	case err == redis.Nil:
-		obj := SaveURL{
+		obj := URLObj{
 			Id:    id,
 			URL:   url,
 			Count: 0,
@@ -36,4 +36,17 @@ func SaveURLToDB(id string, url string) error {
 		return err
 	}
 	return nil
+}
+
+func GetURLFromDB(id string) (*URLObj, error) {
+	val, err := db.Get(ctx, id).Result()
+	if err != nil {
+		return nil, err
+	}
+	obj := URLObj{}
+	err = json.Unmarshal([]byte(val), &obj)
+	if err != nil {
+		return nil, err
+	}
+	return &obj, nil
 }

@@ -22,6 +22,7 @@ func main() {
 	}
 	router := httprouter.New()
 	router.POST("/api/v1/shorten", controllers.CreateShortenedURL)
+	router.GET("/api/v1/analytics", controllers.GetURLAnalytics)
 	router.GET("/hello/:name", Hello)
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
