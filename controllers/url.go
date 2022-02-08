@@ -3,14 +3,15 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
+	"url-shorten/models"
 	"url-shorten/utils"
 
 	"github.com/julienschmidt/httprouter"
 )
 
 type sendResponse struct {
-	Link      string
-	ShortLink string
+	Link      string `json:"link"`
+	ShortLink string `json:"shortLink"`
 }
 
 type requestBodyLink struct {
@@ -35,10 +36,18 @@ func CreateShortenedURL(w http.ResponseWriter, r *http.Request, _ httprouter.Par
 		http.Error(w, "'link' is not a valid url", http.StatusBadRequest)
 		return
 	}
+
 	encodedURL := utils.EncodeURL(*bodyLink.URL)
+	// run for loop till maxlimit if there's a collision?
+	err = models.SaveURLToDB(encodedURL, *bodyLink.URL)
+	if err != nil {
+		http.Error(w, "try again", http.StatusBadRequest)
+		return
+	}
+
 	res := sendResponse{
 		Link:      *bodyLink.URL,
-		ShortLink: encodedURL,
+		ShortLink: r.Host + "/" + encodedURL,
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)

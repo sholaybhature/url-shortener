@@ -10,7 +10,7 @@ var db *redis.Client
 var ctx = context.Background()
 
 func NewDatabase(address string) error {
-	db := redis.NewClient(&redis.Options{
+	db = redis.NewClient(&redis.Options{
 		Addr:     address,
 		Password: "",
 		DB:       0,
