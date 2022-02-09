@@ -40,13 +40,29 @@ func SaveURLToDB(id string, url string) error {
 
 func GetURLFromDB(id string) (*URLObj, error) {
 	val, err := db.Get(ctx, id).Result()
+
 	if err != nil {
 		return nil, err
 	}
 	obj := URLObj{}
-	err = json.Unmarshal([]byte(val), &obj)
+	json.Unmarshal([]byte(val), &obj)
+	return &obj, nil
+}
+
+func UpdateURLInDB(id string) (*URLObj, error) {
+	val, err := db.Get(ctx, id).Result()
+
 	if err != nil {
 		return nil, err
 	}
+	obj := URLObj{}
+	json.Unmarshal([]byte(val), &obj)
+	obj.Count += 1
+	p, err := json.Marshal(&obj)
+	err = db.Set(ctx, id, p, 0).Err()
+	if err != nil {
+		return nil, err
+	}
+
 	return &obj, nil
 }

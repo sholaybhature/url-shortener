@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>URL Shortener</title>
+    <style>
+      #parentContainer {
+        height: 100vh;
+        width: 100vw;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="parentContainer">
+      <div>
+        <h1>URL Shortener</h1>
+      </div>
+      <div>
+        <input
+          type="text"
+          name="inputBox"
+          id="inputBox"
+          placeholder="Enter a link"
+        />
+        <button id="submitButton">Submit</button>
+      </div>
+    </div>
+    <script>
+      document
+        .getElementById("submitButton")
+        .addEventListener("click", function () {
+          let getInputVal = document.getElementById("inputBox").value;
+          fetch("/api/v1/shorten", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ link: getInputVal }),
+          })
+            .then(function (res) {
+              let container = document.getElementById("parentContainer");
+              let div = document.createElement("div");
+              console.log(res, res.status);
+              if (res.status != 201) {
+                div.innerText = "Error, bad request. Not a link?";
+              } else {
+                res.json().then((obj) => {
+                  let aTag = document.createElement("a");
+                  aTag.setAttribute("href", obj.shortLink);
+                  aTag.innerText = obj.shortLink;
+                  div.appendChild(aTag);
+                });
+              }
+              container.appendChild(div);
+            })
+            .catch((err) => console.log(err));
+        });
+    </script>
+  </body>
+</html>

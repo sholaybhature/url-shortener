@@ -47,9 +47,23 @@ func CreateShortenedURL(w http.ResponseWriter, r *http.Request, _ httprouter.Par
 
 	res := sendResponse{
 		Link:      *bodyLink.URL,
-		ShortLink: r.Host + "/" + encodedURL,
+		ShortLink: r.Host + "/id/" + encodedURL,
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(res)
+}
+
+func RedirectShortenedURL(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	id := ps.ByName("id")
+	obj, err := models.UpdateURLInDB(id)
+	if err != nil {
+		http.Error(w, "not found", http.StatusNotFound)
+		return
+	}
+	http.Redirect(w, r, obj.URL, http.StatusSeeOther)
+}
+
+func HomePage(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	http.ServeFile(w, r, "static/index.html")
 }
