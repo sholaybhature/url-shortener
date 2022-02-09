@@ -19,7 +19,6 @@ type VisitorsObj struct {
 	Ip     string    `json:"ip"`
 	Time   time.Time `json:"time"`
 	Device string    `json:"device"`
-	OS     string    `json:"os"`
 }
 
 func SaveURLToDB(id string, url string) error {
@@ -58,7 +57,7 @@ func GetURLFromDB(id string) (*URLObj, error) {
 	return &obj, nil
 }
 
-func UpdateURLInDB(id string, ip string, time time.Time, device string, os string) (*URLObj, error) {
+func UpdateURLInDB(id string, ip string, time time.Time, device string) (*URLObj, error) {
 	val, err := db.Get(ctx, id).Result()
 	fmt.Println(ip, time)
 	if err != nil {
@@ -69,7 +68,6 @@ func UpdateURLInDB(id string, ip string, time time.Time, device string, os strin
 		Ip:     ip,
 		Time:   time,
 		Device: device,
-		OS:     os,
 	}
 	json.Unmarshal([]byte(val), &obj)
 	obj.Count += 1
