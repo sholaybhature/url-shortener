@@ -2,11 +2,14 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"time"
 	"url-shorten/models"
 	"url-shorten/utils"
 
 	"github.com/julienschmidt/httprouter"
+	ua "github.com/mileusna/useragent"
 )
 
 type sendResponse struct {
@@ -56,7 +59,12 @@ func CreateShortenedURL(w http.ResponseWriter, r *http.Request, _ httprouter.Par
 
 func RedirectShortenedURL(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	id := ps.ByName("id")
-	obj, err := models.UpdateURLInDB(id)
+	// ua := r.Header.Get("User-Agent")
+	userAgent := ua.Parse(r.Header.Get("User-Agent"))
+	ip := r.RemoteAddr
+	reqTime := time.Now().UTC()
+	fmt.Print(userAgent.Device, userAgent.OS)
+	obj, err := models.UpdateURLInDB(id, ip, reqTime, userAgent.Device, userAgent.OS)
 	if err != nil {
 		http.Error(w, "not found", http.StatusNotFound)
 		return

@@ -2,15 +2,24 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
+	"time"
 
 	"github.com/go-redis/redis/v8"
 )
 
 type URLObj struct {
-	Id    string `json:"id" redis:"id"`
-	URL   string `json:"link" redis:"link"`
-	Count int    `json:"count" redis:"count"`
-	// Expires string `json:"expires" redis:"expires"`
+	Id       string        `json:"id"`
+	URL      string        `json:"link"`
+	Count    int           `json:"count"`
+	Visitors []VisitorsObj `json:"visitors"`
+}
+
+type VisitorsObj struct {
+	Ip     string    `json:"ip"`
+	Time   time.Time `json:"time"`
+	Device string    `json:"device"`
+	OS     string    `json:"os"`
 }
 
 func SaveURLToDB(id string, url string) error {
@@ -49,15 +58,22 @@ func GetURLFromDB(id string) (*URLObj, error) {
 	return &obj, nil
 }
 
-func UpdateURLInDB(id string) (*URLObj, error) {
+func UpdateURLInDB(id string, ip string, time time.Time, device string, os string) (*URLObj, error) {
 	val, err := db.Get(ctx, id).Result()
-
+	fmt.Println(ip, time)
 	if err != nil {
 		return nil, err
 	}
 	obj := URLObj{}
+	visitorInfo := VisitorsObj{
+		Ip:     ip,
+		Time:   time,
+		Device: device,
+		OS:     os,
+	}
 	json.Unmarshal([]byte(val), &obj)
 	obj.Count += 1
+	obj.Visitors = append(obj.Visitors, visitorInfo)
 	p, err := json.Marshal(&obj)
 	err = db.Set(ctx, id, p, 0).Err()
 	if err != nil {
