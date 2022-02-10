@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// Check if URL is valid or not
 func IsUrl(str string) bool {
 	u, err := url.Parse(str)
 	return err == nil && u.Scheme != "" && u.Host != ""

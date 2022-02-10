@@ -21,6 +21,7 @@ type VisitorsObj struct {
 	Device string    `json:"device"`
 }
 
+// save the newly created url to db
 func SaveURLToDB(id string, url string) error {
 	_, err := db.Get(ctx, id).Result()
 	switch {
@@ -46,6 +47,7 @@ func SaveURLToDB(id string, url string) error {
 	return nil
 }
 
+// fetch url details
 func GetURLFromDB(id string) (*URLObj, error) {
 	val, err := db.Get(ctx, id).Result()
 
@@ -57,6 +59,7 @@ func GetURLFromDB(id string) (*URLObj, error) {
 	return &obj, nil
 }
 
+// update analytics
 func UpdateURLInDB(id string, ip string, time time.Time, device string) (*URLObj, error) {
 	val, err := db.Get(ctx, id).Result()
 	fmt.Println(ip, time)

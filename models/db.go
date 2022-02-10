@@ -6,6 +6,7 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
+// share db connection only in models package
 var db *redis.Client
 var ctx = context.Background()
 
