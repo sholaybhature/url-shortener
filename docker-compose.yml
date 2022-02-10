@@ -1,0 +1,23 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    restart: always
+    depends_on:
+      - redis
+    environment:
+      HTTP_PORT: ":8080"
+      REDIS_PORT: ":6379"
+  redis:
+    image: redis:6.2.6
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --save 60 5
+    volumes:
+      - redisDB:/var/lib/redis/
+volumes:
+  redisDB: 

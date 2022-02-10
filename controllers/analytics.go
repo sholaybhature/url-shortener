@@ -23,16 +23,9 @@ func GetURLAnalytics(w http.ResponseWriter, r *http.Request, _ httprouter.Params
 		if device != "" {
 			// deep copy manually
 			copyObj := models.URLObj{Id: obj.Id, URL: obj.URL, Count: obj.Count}
-			// copyObj.Visitors = nil
-			fmt.Println(copyObj, obj)
-			for i, val := range obj.Visitors {
-				fmt.Println(val.Ip)
-				fmt.Println(strings.ToLower(val.Device))
-				fmt.Println(strings.ToLower(device))
+			for _, val := range obj.Visitors {
 				if strings.Contains(strings.ToLower(val.Device), strings.ToLower(device)) {
-					fmt.Println(1)
 					copyObj.Visitors = append(copyObj.Visitors, val)
-					fmt.Print(i, val)
 				}
 			}
 			json.NewEncoder(w).Encode(copyObj)
